@@ -3,7 +3,7 @@ package cn.jxh.stock.entity;
 
 import java.util.Date;
 
-public class StockNewstock {
+public class SinaNewStock {
 
     private Integer id;
 

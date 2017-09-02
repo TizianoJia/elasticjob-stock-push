@@ -1,6 +1,7 @@
 package cn.jxh.stock.job;
 
-import cn.jxh.stock.entity.StockNewstock;
+import cn.jxh.stock.entity.SinaNewStock;
+import cn.jxh.stock.task.NewStockTask;
 import cn.jxh.stock.utils.DatetimeUtil;
 import cn.jxh.stock.utils.Utils;
 import com.dangdang.ddframe.job.api.ShardingContext;
@@ -10,7 +11,13 @@ import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 
+import javax.mail.internet.InternetAddress;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 
@@ -18,64 +25,57 @@ public class NewStockJob implements SimpleJob {
 
     private static Log log = LogFactory.getLog(NewStockJob.class);
 
+    @Value(value = "#{propertiesReader['mail.recipients']}")
+    private String recipients;
+
+    @Value(value = "#{propertiesReader['mail.nick']}")
+    private String nick;
+
+    @Value(value = "#{propertiesReader['mail.username']}")
+    private String username;
+
+    @Autowired
+    private NewStockTask newStockTask;
+
+    @Autowired
+    private MailSender mailSender;
+
     public void execute(ShardingContext context) {
 
-        log.info("任务触发");
+        log.info("触发 邮件发送任务");
 
-
-        List<StockNewstock> data = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect("http://vip.stock.finance.sina.com.cn/corp/go.php/vRPD_NewStockIssue/page/1.phtml")
-                    .userAgent("Mozilla")
-                    .timeout(3000)
-                    .get();
-
-            List<StockNewstock> StockNewstockList = new ArrayList<>();
-
-            Elements newsHeadlines = doc.select("table#NewStockTable");
-            Elements trs = newsHeadlines.get(0).select("tr");
-
-            for (int i = 3; i < trs.size(); i++) {
-                Elements tds = trs.get(i).select("td");
-
-                StockNewstock stockNewstock = new StockNewstock();
-                stockNewstock.setStockcode(Utils.parseInt(tds.get(0).text(), 0));//证券代码
-                stockNewstock.setPurchasecode(Utils.parseInt(tds.get(1).text(), 0));//申购代码
-                stockNewstock.setStockabbr(tds.get(2).text());//证券简称
-                stockNewstock.setReleasedate(DatetimeUtil.String2Date(tds.get(3).text(),null));//上网发行
-                stockNewstock.setListingdate(DatetimeUtil.String2Date(tds.get(4).text(),null));//上市日期
-                stockNewstock.setIssuenumber(Utils.parseInt(tds.get(5).text().replace("/*", ""), 0));//发行数量(万股)
-                stockNewstock.setOnlineissuenumber(Utils.parseInt(tds.get(6).text(), 0));//上网发行数量(万股)
-                stockNewstock.setIssueprice(Utils.parseDouble(tds.get(7).text(), null));//发行价格(元)
-                stockNewstock.setPeratio(Utils.parseDouble(tds.get(8).text(), null));//市盈率
-                stockNewstock.setPurchaselimit(Utils.parseDouble(tds.get(9).text(), null));//个人申购上限(万股)
-                stockNewstock.setRaisefunds(Utils.parseDouble(tds.get(10).text(), null));//募集资金(亿元)
-                stockNewstock.setSuccessrate(Utils.parseDouble(tds.get(11).text(), null));//网上中签率(%)
-
-                StockNewstockList.add(stockNewstock);
-
-            }
-
-            String todayStockNewstockList = "";
-            for (StockNewstock stockNewstock : StockNewstockList) {
-                System.out.println(stockNewstock.getReleasedate());
-
-                if (DatetimeUtil.diffdates(stockNewstock.getReleasedate(), DatetimeUtil.getSimpleDate(new Date())) == 0) {
-                    todayStockNewstockList = todayStockNewstockList + stockNewstock.getStockabbr() + ";";
-                }
-            }
-
-            if (!Utils.strIsNull(todayStockNewstockList)) {
-                log.info("发送新股提醒");
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        //判断是否需要发送邮件
+        if (newStockTask.getNewStockList().size() == 0) {
+            log.info("无通知需要发送");
+            return;
         }
+
+        //组织邮件内容
+        StringBuffer subject = new StringBuffer();
+        subject.append(DatetimeUtil.Date2String(new Date()) + "日股票提醒推送");
+
+        StringBuffer text = new StringBuffer();
+        text.append("今日股票申购\n\r");
+        for (SinaNewStock SinaNewStock : newStockTask.getNewStockList()) {
+            text.append(SinaNewStock.getStockabbr() + "\n");
+        }
+        text.append("------------------------------\n");
+
+        //发送邮件
+        for (String to : recipients.split(";")) {
+            try {
+                SimpleMailMessage mailMessage = new SimpleMailMessage();
+                mailMessage.setFrom(javax.mail.internet.MimeUtility.encodeText(nick) + " <" + username + ">");
+                mailMessage.setSubject(subject.toString());
+                mailMessage.setText(text.toString());
+                mailMessage.setTo(to);
+                mailSender.send(mailMessage);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
-
-
 }
 
 

@@ -18,6 +18,6 @@
 
     <!-- 配置数据流作业-->
     <job:simple id="NewStockJob" class="cn.jxh.stock.job.NewStockJob" registry-center-ref="regCenter"
-                cron="0 0/3 * * * ?" sharding-total-count="1"/>
+                cron="0 45 10 * * ?" sharding-total-count="1"/>
 
 </beans>

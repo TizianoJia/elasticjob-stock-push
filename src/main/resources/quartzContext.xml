@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
+
+	<!-- 配置任务线性池 -->
+	<task:executor id="executor" pool-size="4" />
+	<task:scheduler id="scheduler" pool-size="4" />
+
+	<!-- 开启定时任务 -->
+	<task:annotation-driven scheduler="scheduler" executor="executor" proxy-target-class="true" />
+
+	<bean id="newStockTask" class="cn.jxh.stock.task.NewStockTask" />
+	<task:scheduled-tasks scheduler="scheduler">
+		<!--
+		<task:scheduled ref="newStockTask" method="crawlNewStockList" initial-delay="3000" fixed-delay="180000" />
+		-->
+		<task:scheduled ref="newStockTask" method="crawlNewStockList" initial-delay="3000" fixed-delay="180000" />
+	</task:scheduled-tasks>
+
+</beans>

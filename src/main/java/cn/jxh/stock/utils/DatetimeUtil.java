@@ -16,6 +16,17 @@ public class DatetimeUtil {
     public final static String DATE_TIME_PATTERN = DATE_PATTERN + " " + TIME_PATTERN;
 
     /**
+     * Date to String
+     *
+     * @param DateString
+     * @return
+     */
+    public static String Date2String(Date DateString) {
+        DateFormat fmt = new SimpleDateFormat(DATE_PATTERN);
+        return fmt.format(DateString);
+    }
+
+    /**
      * String to Date
      *
      * @param DateString

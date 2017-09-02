@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
 		   http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+           http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+           http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
     <!-- 自动扫描 -->
-    <context:component-scan base-package="cn.jxh.job.*"/>
+    <context:component-scan base-package="cn.jxh.stock.*"/>
 
     <!-- 激活利用注解进行装配 -->
     <context:annotation-config />
@@ -17,18 +17,23 @@
         <property name="locations">
             <list>
                 <value>classpath:common.properties</value>
+                <value>classpath:mail.properties</value>
             </list>
         </property>
+        <property name="fileEncoding" value="UTF-8"></property>
     </bean>
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
+                <value>classpath:mail.properties</value>
                 <value>classpath:zk.properties</value>
             </list>
         </property>
     </bean>
 
     <import resource="classpath*:/elasticJobContext.xml"/>
+    <import resource="classpath*:/quartzContext.xml"/>
+    <import resource="classpath*:/mailContext.xml"/>
 
 </beans>
