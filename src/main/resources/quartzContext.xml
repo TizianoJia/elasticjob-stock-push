@@ -13,9 +13,6 @@
 
 	<bean id="newStockTask" class="cn.jxh.stock.task.NewStockTask" />
 	<task:scheduled-tasks scheduler="scheduler">
-		<!--
-		<task:scheduled ref="newStockTask" method="crawlNewStockList" initial-delay="3000" fixed-delay="180000" />
-		-->
 		<task:scheduled ref="newStockTask" method="crawlNewStockList" initial-delay="3000" fixed-delay="180000" />
 	</task:scheduled-tasks>
 

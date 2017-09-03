@@ -17,6 +17,9 @@
         <slf4j.version>1.7.21</slf4j.version>
         <log4j.version>2.7</log4j.version>
         <mail.version>1.4.7</mail.version>
+        <http.version>4.2.1</http.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <fastjson.version>1.2.20</fastjson.version>
     </properties>
 
     <dependencies>
@@ -101,6 +104,36 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>${mail.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${http.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${http.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ali</groupId>
+            <artifactId>taobao-sdk-java-auto</artifactId>
+            <version>1479188381469-20170724</version>
         </dependency>
 
     </dependencies>

@@ -18,6 +18,7 @@
             <list>
                 <value>classpath:common.properties</value>
                 <value>classpath:mail.properties</value>
+                <value>classpath:dingtalk.properties</value>
             </list>
         </property>
         <property name="fileEncoding" value="UTF-8"></property>

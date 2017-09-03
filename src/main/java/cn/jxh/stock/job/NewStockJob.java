@@ -3,6 +3,7 @@ package cn.jxh.stock.job;
 import cn.jxh.stock.entity.SinaNewStock;
 import cn.jxh.stock.task.NewStockTask;
 import cn.jxh.stock.utils.DatetimeUtil;
+import cn.jxh.stock.utils.DingtalkUtil;
 import cn.jxh.stock.utils.Utils;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
@@ -25,6 +26,12 @@ public class NewStockJob implements SimpleJob {
 
     private static Log log = LogFactory.getLog(NewStockJob.class);
 
+    @Value(value = "#{propertiesReader['send.mail']}")
+    private String sendmail;
+
+    @Value(value = "#{propertiesReader['send.dingtalk']}")
+    private String senddingtalk;
+
     @Value(value = "#{propertiesReader['mail.recipients']}")
     private String recipients;
 
@@ -44,13 +51,13 @@ public class NewStockJob implements SimpleJob {
 
         log.info("触发 邮件发送任务");
 
-        //判断是否需要发送邮件
+        //判断是否需要发送
         if (newStockTask.getNewStockList().size() == 0) {
             log.info("无通知需要发送");
             return;
         }
 
-        //组织邮件内容
+        //组织内容
         StringBuffer subject = new StringBuffer();
         subject.append(DatetimeUtil.Date2String(new Date()) + "日股票提醒推送");
 
@@ -59,20 +66,28 @@ public class NewStockJob implements SimpleJob {
         for (SinaNewStock SinaNewStock : newStockTask.getNewStockList()) {
             text.append(SinaNewStock.getStockabbr() + "\n");
         }
-        text.append("------------------------------\n");
+        text.append("------------------------------");
 
-        //发送邮件
-        for (String to : recipients.split(";")) {
-            try {
-                SimpleMailMessage mailMessage = new SimpleMailMessage();
-                mailMessage.setFrom(javax.mail.internet.MimeUtility.encodeText(nick) + " <" + username + ">");
-                mailMessage.setSubject(subject.toString());
-                mailMessage.setText(text.toString());
-                mailMessage.setTo(to);
-                mailSender.send(mailMessage);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        //判断是否需要发送邮件
+        if (sendmail.equals("Y")) {
+            //发送邮件
+            for (String to : recipients.split(";")) {
+                try {
+                    SimpleMailMessage mailMessage = new SimpleMailMessage();
+                    mailMessage.setFrom(javax.mail.internet.MimeUtility.encodeText(nick) + " <" + username + ">");
+                    mailMessage.setSubject(subject.toString());
+                    mailMessage.setText(text.toString());
+                    mailMessage.setTo(to);
+                    mailSender.send(mailMessage);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
+        }
+
+        //发送钉钉
+        if (senddingtalk.equals("Y")) {
+            DingtalkUtil.sendText(text.toString());
         }
 
     }
