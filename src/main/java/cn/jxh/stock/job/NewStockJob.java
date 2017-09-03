@@ -4,20 +4,15 @@ import cn.jxh.stock.entity.SinaNewStock;
 import cn.jxh.stock.task.NewStockTask;
 import cn.jxh.stock.utils.DatetimeUtil;
 import cn.jxh.stock.utils.DingtalkUtil;
-import cn.jxh.stock.utils.Utils;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 
-import javax.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
