@@ -1,0 +1,1 @@
+mvn install:install-file -DgroupId=com.ali -DartifactId=taobao-sdk-java-auto -Dversion=1479188381469-20170724 -Dpackaging=jar -Dfile="D:\Program Files\apache-maven-3.5.0\third jar\taobao-sdk-java-auto_1479188381469-20170724.jar"
